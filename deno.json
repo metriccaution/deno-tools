@@ -1,5 +1,5 @@
 {
-    "tasks": {
-        "test": "deno lint && deno test"
-    }
+  "tasks": {
+    "test": "deno lint && deno test && deno fmt"
+  }
 }
