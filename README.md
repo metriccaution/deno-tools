@@ -21,6 +21,10 @@ cat ./file.yaml | deno run https://raw.githubusercontent.com/metriccaution/deno-
 - This is intended for use in piping YAML files through tools like `jq`, and
   then possibly back to YAML afterwards
 
+### Todoist Client
+
+- A client library for [Todoist](https://todoist.com/).
+
 ## Development
 
 Run the tests using:
