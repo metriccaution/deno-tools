@@ -7,206 +7,207 @@ export interface TodoistClient {
   // Projects
   listProjects: () => Promise<Project[]>;
   createProject: (request: CreateProject) => Promise<Project>;
-  getProject: (id: number) => Promise<Project | undefined>;
-  updateProject: (id: number, request: UpdateProject) => Promise<void>;
-  deleteProject: (id: number) => Promise<void>;
-  projectCollaborators: (id: number) => Promise<Collaborator[]>;
+  getProject: (id: string) => Promise<Project | undefined>;
+  updateProject: (id: string, request: UpdateProject) => Promise<void>;
+  deleteProject: (id: string) => Promise<void>;
+  projectCollaborators: (id: string) => Promise<Collaborator[]>;
   // Sections
-  listSections: (projectId: number) => Promise<Section[]>;
+  listSections: (projectId: string) => Promise<Section[]>;
   createSection: (request: CreateSecion) => Promise<Section>;
-  getSection: (id: number) => Promise<Section | undefined>;
-  updateSection: (id: number, request: { name: string }) => Promise<void>;
-  deleteSection: (id: number) => Promise<void>;
+  getSection: (id: string) => Promise<Section | undefined>;
+  updateSection: (id: string, request: { name: string }) => Promise<void>;
+  deleteSection: (id: string) => Promise<void>;
   // Tasks
   listActiveTasks: (query?: Partial<TaskQuery>) => Promise<Task[]>;
   createTask: (request: CreateTask) => Promise<Task>;
-  getTask: (id: number) => Promise<Task | undefined>;
-  updateTask: (id: number, request: Partial<UpdateTask>) => Promise<void>;
-  closeTask: (id: number) => Promise<void>;
-  reopenTask: (id: number) => Promise<void>;
-  deleteTask: (id: number) => Promise<void>;
+  getTask: (id: string) => Promise<Task | undefined>;
+  updateTask: (id: string, request: Partial<UpdateTask>) => Promise<void>;
+  closeTask: (id: string) => Promise<void>;
+  reopenTask: (id: string) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
   // Comments
   listComments: (query: CommentQuery) => Promise<Comment[]>;
   createComment: (
-    request: CreateTaskComment | CreateProjectComment,
+    request: CreateTaskComment | CreateProjectComment
   ) => Promise<Comment>;
-  getComment: (id: number) => Promise<Comment>;
-  updateComment: (id: number, request: { content: string }) => Promise<void>;
-  deleteComment: (id: number) => Promise<void>;
+  getComment: (id: string) => Promise<Comment>;
+  updateComment: (id: string, request: { content: string }) => Promise<void>;
+  deleteComment: (id: string) => Promise<void>;
   // Labels
   listLabels: () => Promise<Label[]>;
   createLabel: (request: CreateLabel) => Promise<Label>;
-  getLabel: (id: number) => Promise<Label | undefined>;
-  updateLabel: (id: number, request: Partial<UpdateLabel>) => Promise<void>;
-  deleteLabel: (id: number) => Promise<void>;
+  getLabel: (id: string) => Promise<Label | undefined>;
+  updateLabel: (id: string, request: Partial<UpdateLabel>) => Promise<void>;
+  deleteLabel: (id: string) => Promise<void>;
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#projects
+ * https://developer.todoist.com/rest/v2/?shell#projects
  */
 export interface Project {
-  id: number;
-  parent_id?: number;
+  id: string;
+  parent_id?: string;
   order: number;
   color: Color;
   name: string;
-  shared: boolean;
-  favorite: boolean;
+  is_shared: boolean;
+  is_favorite: boolean;
   url: string;
   comment_count: number;
-  sync_id: number;
-  inbox_project?: boolean;
-  team_inbox?: boolean;
+  sync_id: string;
+  is_inbox_project?: boolean;
+  is_team_inbox?: boolean;
+  // TODO - view_style
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#update-a-project
+ * https://developer.todoist.com/rest/v2/?shell#update-a-project
  */
 export interface UpdateProject {
   name?: string;
   color?: Color;
-  favorite?: boolean;
+  is_favorite?: boolean;
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#create-a-new-project
+ * https://developer.todoist.com/rest/v2/?shell#create-a-new-project
  */
 export interface CreateProject extends UpdateProject {
   name: string;
-  parent_id?: number;
+  parent_id?: string;
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#get-all-collaborators
+ * https://developer.todoist.com/rest/v2/?shell#get-all-collaborators
  */
 export interface Collaborator {
-  id: number;
+  id: string;
   name: string;
   email: string;
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#sections
+ * https://developer.todoist.com/rest/v2/?shell#sections
  */
 export interface Section {
-  id: number;
-  project_id: number;
+  id: string;
+  project_id: string;
   order: number;
   name: string;
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#create-a-new-section
+ * https://developer.todoist.com/rest/v2/?shell#create-a-new-section
  */
 export interface CreateSecion {
   name: string;
-  project_id: number;
+  project_id: string;
   order?: number;
 }
 
 export type Priority = 1 | 2 | 3 | 4;
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#tasks
+ * https://developer.todoist.com/rest/v2/?shell#tasks
  */
 export interface Task {
-  id: number;
-  project_id: number;
-  section_id: number;
+  id: string;
+  project_id: string;
+  section_id: string | null;
   content: string;
   description: string;
-  completed: boolean;
-  label_ids: number[];
-  parent_id?: number;
+  is_completed: boolean;
+  labels: string[];
+  parent_id?: string;
   order: number;
   priority: Priority;
-  due?: {
+  due: {
     string: string;
     date: string;
     recurring: boolean;
     datetime?: string;
     timezone?: string;
-  };
+  } | null;
   url: string;
   comment_count: number;
-  assignee?: number;
-  assigner: number;
-  created: string;
+  assignee_id: string | null;
+  assigner_id: string | null;
+  created_at: string;
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#get-active-tasks
+ * https://developer.todoist.com/rest/v2/?shell#get-active-tasks
  */
 export interface TaskQuery {
-  project_id: number;
-  section_id: number;
-  label_id: number;
+  project_id: string;
+  section_id: string;
+  label_id: string;
   filter: string | FilterComponent;
   lang: string;
   ids: string; // TODO - Maybe a list we concat ourselves
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#update-a-task
+ * https://developer.todoist.com/rest/v2/?shell#update-a-task
  */
 export interface UpdateTask {
   content: string;
   description: string;
-  label_ids: number[];
+  label_ids: string[];
   priority: Priority;
   due_string: string;
   due_date: string;
   due_datetime: string;
   due_lang: string;
-  assignee: number;
+  assignee: string;
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#create-a-new-task
+ * https://developer.todoist.com/rest/v2/?shell#create-a-new-task
  */
 export interface CreateTask {
   content: string;
   description?: string;
-  project_id?: number;
-  section_id?: number;
-  parent_id?: number;
+  project_id?: string;
+  section_id?: string;
+  parent_id?: string;
   order?: number;
-  label_ids?: number[];
+  label_ids?: string[];
   priority?: Priority;
   due_string?: string;
   due_date?: string;
   due_datetime?: string;
   due_lang?: string;
-  assignee?: number;
+  assignee?: string;
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#comments
+ * https://developer.todoist.com/rest/v2/?shell#comments
  */
 export interface Comment {
-  id: number;
-  task_id: number;
-  project_id: number;
-  posted: string;
+  id: string;
+  task_id: string | null;
+  project_id: string | null;
+  posted_at: string;
   content: string;
-  attachment?: {
+  attachment: {
     file_name: string;
     file_type: string;
     file_url: string;
     resource_type: string;
-  };
+  } | null;
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#get-all-comments
+ * https://developer.todoist.com/rest/v2/?shell#get-all-comments
  */
-export type CommentQuery = { project_id: number } | { task_id: number };
+export type CommentQuery = { project_id: string } | { task_id: string };
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#create-a-new-comment
+ * https://developer.todoist.com/rest/v2/?shell#create-a-new-comment
  */
 export interface CreateTaskComment {
-  task_id: number;
+  task_id: string;
   content: string;
   attachment?: {
     file_name: string;
@@ -217,10 +218,10 @@ export interface CreateTaskComment {
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#create-a-new-comment
+ * https://developer.todoist.com/rest/v2/?shell#create-a-new-comment
  */
 export interface CreateProjectComment {
-  project_id: number;
+  project_id: string;
   content: string;
   attachment?: {
     file_name: string;
@@ -231,34 +232,34 @@ export interface CreateProjectComment {
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#labels
+ * https://developer.todoist.com/rest/v2/?shell#labels
  */
 export interface Label {
-  id: number;
+  id: string;
   name: string;
   color: Color;
   order: number;
-  favorite: boolean;
+  is_favorite: boolean;
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#create-a-new-label
+ * https://developer.todoist.com/rest/v2/?shell#create-a-new-label
  */
 export interface CreateLabel {
   name: string;
   order?: number;
   color?: Color;
-  favorite?: boolean;
+  is_favorite?: boolean;
 }
 
 /**
- * https://developer.todoist.com/rest/v1/?shell#update-a-label
+ * https://developer.todoist.com/rest/v2/?shell#update-a-label
  */
 export interface UpdateLabel {
   name: string;
   order: number;
   color: Color;
-  favorite: boolean;
+  is_favorite: boolean;
 }
 
 /**
@@ -274,9 +275,9 @@ export class Todoist implements TodoistClient {
   private async get(
     path: string,
     params?: URLSearchParams,
-    allowMissing = false,
+    allowMissing = false
   ): Promise<Response> {
-    const url = new URL(path, "https://api.todoist.com/rest/v1/");
+    const url = new URL(path, "https://api.todoist.com/rest/v2/");
     if (params) {
       url.search = params.toString();
     }
@@ -293,7 +294,7 @@ export class Todoist implements TodoistClient {
 
     if (!res.ok) {
       throw new Error(
-        `Error requesting from Todoist (${path}): ${res.status} - ${res.statusText}`,
+        `Error requesting from Todoist (${path}): ${res.status} - ${res.statusText}`
       );
     }
     return res;
@@ -301,7 +302,7 @@ export class Todoist implements TodoistClient {
 
   private async post(path: string, body: unknown) {
     // TODO - Retries
-    const res = await fetch(new URL(path, "https://api.todoist.com/rest/v1/"), {
+    const res = await fetch(new URL(path, "https://api.todoist.com/rest/v2/"), {
       method: "POST",
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
@@ -312,7 +313,7 @@ export class Todoist implements TodoistClient {
 
     if (!res.ok) {
       throw new Error(
-        `Error requesting from Todoist (${path}): ${res.status} - ${res.statusText}`,
+        `Error requesting from Todoist (${path}): ${res.status} - ${res.statusText}`
       );
     }
 
@@ -321,7 +322,7 @@ export class Todoist implements TodoistClient {
 
   private async delete(path: string): Promise<void> {
     // TODO - Retries
-    const res = await fetch(new URL(path, "https://api.todoist.com/rest/v1/"), {
+    const res = await fetch(new URL(path, "https://api.todoist.com/rest/v2/"), {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
@@ -331,12 +332,12 @@ export class Todoist implements TodoistClient {
 
     if (!res.ok) {
       throw new Error(
-        `Error listing projects: ${res.status} - ${res.statusText}`,
+        `Error listing projects: ${res.status} - ${res.statusText}`
       );
     }
   }
 
-  public async getProject(id: number): Promise<Project | undefined> {
+  public async getProject(id: string): Promise<Project | undefined> {
     const res = await this.get(`projects/${id}`, new URLSearchParams(), true);
     return res.status !== 404 ? res.json() : undefined;
   }
@@ -352,32 +353,32 @@ export class Todoist implements TodoistClient {
   }
 
   public async updateProject(
-    id: number,
-    request: UpdateProject,
+    id: string,
+    request: UpdateProject
   ): Promise<void> {
     await this.post(`projects/${id}`, request);
   }
 
-  public async deleteProject(id: number): Promise<void> {
+  public async deleteProject(id: string): Promise<void> {
     await this.delete(`projects/${id}`);
   }
 
-  public async projectCollaborators(id: number): Promise<Collaborator[]> {
+  public async projectCollaborators(id: string): Promise<Collaborator[]> {
     const res = await this.get(
       `projects/${id}/collaborators`,
       new URLSearchParams(),
-      true,
+      true
     );
     return res.json();
   }
 
-  public async listSections(projectId: number): Promise<Section[]> {
+  public async listSections(projectId: string): Promise<Section[]> {
     const res = await this.get(
       `sections`,
       new URLSearchParams({
         project_id: `${projectId}`,
       }),
-      true,
+      true
     );
     return res.json();
   }
@@ -387,19 +388,19 @@ export class Todoist implements TodoistClient {
     return res.json();
   }
 
-  public async getSection(id: number): Promise<Section | undefined> {
+  public async getSection(id: string): Promise<Section | undefined> {
     const res = await this.get(`sections/${id}`, new URLSearchParams(), true);
     return res.status !== 404 ? res.json() : undefined;
   }
 
   public async updateSection(
-    id: number,
-    request: { name: string },
+    id: string,
+    request: { name: string }
   ): Promise<void> {
     await this.post(`sections/${id}`, request);
   }
 
-  public async deleteSection(id: number): Promise<void> {
+  public async deleteSection(id: string): Promise<void> {
     await this.delete(`sections/${id}`);
   }
 
@@ -408,8 +409,7 @@ export class Todoist implements TodoistClient {
       "tasks",
       query
         ? new URLSearchParams(
-          Object.entries(query).reduce(
-            (obj, [k, v]) => {
+            Object.entries(query).reduce((obj, [k, v]) => {
               // Stringify non-string values
               let value = `${v}`;
 
@@ -423,11 +423,9 @@ export class Todoist implements TodoistClient {
 
               obj[k] = value;
               return obj;
-            },
-            {} as Record<string, string>,
-          ),
-        )
-        : undefined,
+            }, {} as Record<string, string>)
+          )
+        : undefined
     );
     return res.json();
   }
@@ -437,27 +435,27 @@ export class Todoist implements TodoistClient {
     return res.json();
   }
 
-  public async getTask(id: number): Promise<Task | undefined> {
+  public async getTask(id: string): Promise<Task | undefined> {
     const res = await this.get(`tasks/${id}`, new URLSearchParams(), true);
     return res.status !== 404 ? res.json() : undefined;
   }
 
   public async updateTask(
-    id: number,
-    request: Partial<UpdateTask>,
+    id: string,
+    request: Partial<UpdateTask>
   ): Promise<void> {
     await this.post(`tasks/${id}`, request);
   }
 
-  public async closeTask(id: number): Promise<void> {
+  public async closeTask(id: string): Promise<void> {
     await this.post(`tasks/${id}/close`, undefined);
   }
 
-  public async reopenTask(id: number): Promise<void> {
+  public async reopenTask(id: string): Promise<void> {
     await this.post(`tasks/${id}/reopen`, undefined);
   }
 
-  public async deleteTask(id: number): Promise<void> {
+  public async deleteTask(id: string): Promise<void> {
     await this.delete(`tasks/${id}`);
   }
 
@@ -466,39 +464,39 @@ export class Todoist implements TodoistClient {
       "comments",
       query
         ? new URLSearchParams(
-          Object.entries(query).reduce(
-            (obj, [k, v]) => ({
-              ...obj,
-              [k]: `${v}`,
-            }),
-            {} as Record<string, string>,
-          ),
-        )
-        : undefined,
+            Object.entries(query).reduce(
+              (obj, [k, v]) => ({
+                ...obj,
+                [k]: `${v}`,
+              }),
+              {} as Record<string, string>
+            )
+          )
+        : undefined
     );
     return res.json();
   }
 
   public async createComment(
-    request: CreateTaskComment | CreateProjectComment,
+    request: CreateTaskComment | CreateProjectComment
   ): Promise<Comment> {
     const res = await this.post("comments", request);
     return res.json();
   }
 
-  public async getComment(id: number): Promise<Comment> {
+  public async getComment(id: string): Promise<Comment> {
     const res = await this.get(`comments/${id}`);
     return res.json();
   }
 
   public async updateComment(
-    id: number,
-    request: { content: string },
+    id: string,
+    request: { content: string }
   ): Promise<void> {
     await this.post(`comments/${id}`, request);
   }
 
-  public async deleteComment(id: number): Promise<void> {
+  public async deleteComment(id: string): Promise<void> {
     await this.delete(`comments/${id}`);
   }
 
@@ -512,19 +510,19 @@ export class Todoist implements TodoistClient {
     return res.json();
   }
 
-  public async getLabel(id: number): Promise<Label | undefined> {
+  public async getLabel(id: string): Promise<Label | undefined> {
     const res = await this.get(`labels/${id}`, new URLSearchParams(), true);
     return res.status !== 404 ? res.json() : undefined;
   }
 
   public async updateLabel(
-    id: number,
-    request: Partial<UpdateLabel>,
+    id: string,
+    request: Partial<UpdateLabel>
   ): Promise<void> {
     await this.post(`labels/${id}`, request);
   }
 
-  public async deleteLabel(id: number): Promise<void> {
+  public async deleteLabel(id: string): Promise<void> {
     await this.delete(`labels/${id}`);
   }
 }
