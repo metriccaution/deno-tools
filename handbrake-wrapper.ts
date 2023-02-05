@@ -213,7 +213,7 @@ async function handbrake(
 ): Promise<void> {
   const args: Record<string, string> = {
     "-i": source,
-    "-o": join(destination, name),
+    "-o": join(destination, name + ".mp4"),
     "-t": `${title}`,
     "-f": "mp4",
   };
