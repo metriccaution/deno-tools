@@ -11,7 +11,9 @@ import { join } from "https://deno.land/std@0.170.0/path/mod.ts";
 import { exec } from "./lib/exec.ts";
 
 const outputDir = join(Deno.env.get("HOME") || ".", "Videos");
-const transcodeFrom = await diskDir(join("/", "media", Deno.env.get("USER")));
+const transcodeFrom = await diskDir(
+  join("/", "media", Deno.env.get("USER") ?? "user"),
+);
 
 console.log(new Date().toISOString(), "Reading disk metadata");
 const metadata = await readMetadata(transcodeFrom);
@@ -19,7 +21,7 @@ console.log(new Date().toISOString(), "Read disk metadata");
 const chosenTitles = await pick(
   "Which titles to transcode?",
   (i, n) => `${n}: ${i.name} (${Math.round(i.durationMs / (1000 * 60))}) mins`,
-  metadata.TitleList.map(mapTitle)
+  metadata.TitleList.map(mapTitle),
 );
 
 const titles: HandbrakeArgs[] = [];
@@ -30,23 +32,21 @@ for (const title of chosenTitles) {
     message: `What do you want to call the output file`,
   });
 
-  const audio =
-    title.audio.length > 1
-      ? await pick(
-          "Which audio",
-          (i) => `${i.description} (${i.language})`,
-          title.audio
-        )
-      : title.audio;
+  const audio = title.audio.length > 1
+    ? await pick(
+      "Which audio",
+      (i) => `${i.description} (${i.language})`,
+      title.audio,
+    )
+    : title.audio;
 
-  const subtitles =
-    title.subtitles.length > 1
-      ? await pick(
-          "Which subtitles",
-          (s) => `${s.name} - ${s.language}`,
-          title.subtitles
-        )
-      : title.subtitles;
+  const subtitles = title.subtitles.length > 1
+    ? await pick(
+      "Which subtitles",
+      (s) => `${s.name} - ${s.language}`,
+      title.subtitles,
+    )
+    : title.subtitles;
 
   titles.push({
     name: outputName,
@@ -88,7 +88,7 @@ async function diskDir(mediaDir: string): Promise<string> {
 async function pick<T>(
   message: string,
   title: (i: T, n: number) => string,
-  data: T[]
+  data: T[],
 ): Promise<T[]> {
   const byName: Record<string, T> = data.reduce((grouped, i, n) => {
     return {
@@ -131,7 +131,7 @@ interface MediaTitle {
 }
 
 async function readMetadata(
-  diskDir: string
+  diskDir: string,
 ): Promise<{ TitleList: MediaTitle[] }> {
   const stdout = await exec([
     "HandBrakeCLI",
@@ -171,8 +171,7 @@ function mapTitle(metadata: MediaTitle): TitleMetadata {
   return {
     index: metadata.Index,
     name: metadata.Name,
-    durationMs:
-      metadata.Duration.Hours * 1000 * 60 * 60 +
+    durationMs: metadata.Duration.Hours * 1000 * 60 * 60 +
       metadata.Duration.Minutes * 1000 * 60 +
       metadata.Duration.Seconds * 1000,
     resolution: {
@@ -209,7 +208,7 @@ interface HandbrakeArgs {
 async function handbrake(
   source: string,
   destination: string,
-  { title, subtitles, audio, name }: HandbrakeArgs
+  { title, subtitles, audio, name }: HandbrakeArgs,
 ): Promise<void> {
   const args: Record<string, string> = {
     "-i": source,

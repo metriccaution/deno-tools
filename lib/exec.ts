@@ -16,7 +16,7 @@ export async function exec(cmd: string[]): Promise<string> {
 
   if (code !== 0) {
     throw new Error(
-      `Failed to fetch DVD metadata: ${new TextDecoder().decode(rawError)}`
+      `Failed to fetch DVD metadata: ${new TextDecoder().decode(rawError)}`,
     );
   }
 

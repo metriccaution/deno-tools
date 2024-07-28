@@ -28,7 +28,7 @@ export interface TodoistClient {
   // Comments
   listComments: (query: CommentQuery) => Promise<Comment[]>;
   createComment: (
-    request: CreateTaskComment | CreateProjectComment
+    request: CreateTaskComment | CreateProjectComment,
   ) => Promise<Comment>;
   getComment: (id: string) => Promise<Comment>;
   updateComment: (id: string, request: { content: string }) => Promise<void>;
@@ -275,7 +275,7 @@ export class Todoist implements TodoistClient {
   private async get(
     path: string,
     params?: URLSearchParams,
-    allowMissing = false
+    allowMissing = false,
   ): Promise<Response> {
     const url = new URL(path, "https://api.todoist.com/rest/v2/");
     if (params) {
@@ -294,7 +294,7 @@ export class Todoist implements TodoistClient {
 
     if (!res.ok) {
       throw new Error(
-        `Error requesting from Todoist (${path}): ${res.status} - ${res.statusText}`
+        `Error requesting from Todoist (${path}): ${res.status} - ${res.statusText}`,
       );
     }
     return res;
@@ -313,7 +313,7 @@ export class Todoist implements TodoistClient {
 
     if (!res.ok) {
       throw new Error(
-        `Error requesting from Todoist (${path}): ${res.status} - ${res.statusText}`
+        `Error requesting from Todoist (${path}): ${res.status} - ${res.statusText}`,
       );
     }
 
@@ -332,7 +332,7 @@ export class Todoist implements TodoistClient {
 
     if (!res.ok) {
       throw new Error(
-        `Error listing projects: ${res.status} - ${res.statusText}`
+        `Error listing projects: ${res.status} - ${res.statusText}`,
       );
     }
   }
@@ -354,7 +354,7 @@ export class Todoist implements TodoistClient {
 
   public async updateProject(
     id: string,
-    request: UpdateProject
+    request: UpdateProject,
   ): Promise<void> {
     await this.post(`projects/${id}`, request);
   }
@@ -367,7 +367,7 @@ export class Todoist implements TodoistClient {
     const res = await this.get(
       `projects/${id}/collaborators`,
       new URLSearchParams(),
-      true
+      true,
     );
     return res.json();
   }
@@ -378,7 +378,7 @@ export class Todoist implements TodoistClient {
       new URLSearchParams({
         project_id: `${projectId}`,
       }),
-      true
+      true,
     );
     return res.json();
   }
@@ -395,7 +395,7 @@ export class Todoist implements TodoistClient {
 
   public async updateSection(
     id: string,
-    request: { name: string }
+    request: { name: string },
   ): Promise<void> {
     await this.post(`sections/${id}`, request);
   }
@@ -409,23 +409,23 @@ export class Todoist implements TodoistClient {
       "tasks",
       query
         ? new URLSearchParams(
-            Object.entries(query).reduce((obj, [k, v]) => {
-              // Stringify non-string values
-              let value = `${v}`;
+          Object.entries(query).reduce((obj, [k, v]) => {
+            // Stringify non-string values
+            let value = `${v}`;
 
-              switch (k) {
-                case "filter":
-                  if (typeof v === "object") {
-                    value = toFilter(v);
-                  }
-                  break;
-              }
+            switch (k) {
+              case "filter":
+                if (typeof v === "object") {
+                  value = toFilter(v);
+                }
+                break;
+            }
 
-              obj[k] = value;
-              return obj;
-            }, {} as Record<string, string>)
-          )
-        : undefined
+            obj[k] = value;
+            return obj;
+          }, {} as Record<string, string>),
+        )
+        : undefined,
     );
     return res.json();
   }
@@ -442,7 +442,7 @@ export class Todoist implements TodoistClient {
 
   public async updateTask(
     id: string,
-    request: Partial<UpdateTask>
+    request: Partial<UpdateTask>,
   ): Promise<void> {
     await this.post(`tasks/${id}`, request);
   }
@@ -464,21 +464,21 @@ export class Todoist implements TodoistClient {
       "comments",
       query
         ? new URLSearchParams(
-            Object.entries(query).reduce(
-              (obj, [k, v]) => ({
-                ...obj,
-                [k]: `${v}`,
-              }),
-              {} as Record<string, string>
-            )
-          )
-        : undefined
+          Object.entries(query).reduce(
+            (obj, [k, v]) => ({
+              ...obj,
+              [k]: `${v}`,
+            }),
+            {} as Record<string, string>,
+          ),
+        )
+        : undefined,
     );
     return res.json();
   }
 
   public async createComment(
-    request: CreateTaskComment | CreateProjectComment
+    request: CreateTaskComment | CreateProjectComment,
   ): Promise<Comment> {
     const res = await this.post("comments", request);
     return res.json();
@@ -491,7 +491,7 @@ export class Todoist implements TodoistClient {
 
   public async updateComment(
     id: string,
-    request: { content: string }
+    request: { content: string },
   ): Promise<void> {
     await this.post(`comments/${id}`, request);
   }
@@ -517,7 +517,7 @@ export class Todoist implements TodoistClient {
 
   public async updateLabel(
     id: string,
-    request: Partial<UpdateLabel>
+    request: Partial<UpdateLabel>,
   ): Promise<void> {
     await this.post(`labels/${id}`, request);
   }
